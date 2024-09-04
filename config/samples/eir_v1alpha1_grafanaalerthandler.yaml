@@ -1,0 +1,9 @@
+apiVersion: eir.margays.dev/v1alpha1
+kind: GrafanaAlertHandler
+metadata:
+  labels:
+    app.kubernetes.io/name: eir
+    app.kubernetes.io/managed-by: kustomize
+  name: grafanaalerthandler-sample
+spec:
+  # TODO(user): Add fields here
