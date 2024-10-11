@@ -1,0 +1,19 @@
+{
+    "Reading": 33.0,
+    "ReadingType": "Temperature",
+    "ReadingUnit": "Celsius",
+    "Thresholds": {
+        "UpperCritical": {
+            "Value": 40.0
+        },
+        "UpperWarning": {
+            "Value": 35.0
+        },
+        "LowerWarning": {
+            "Value": 25.0
+        },
+        "LowerCritical": {
+            "Value": 20.0
+        }
+    }
+}

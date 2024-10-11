@@ -1,4 +1,0 @@
-## Append samples of your project ##
-resources:
-- eir_v1alpha1_grafanaalerthandler.yaml
-# +kubebuilder:scaffold:manifestskustomizesamples

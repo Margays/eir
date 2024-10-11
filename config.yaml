@@ -1,0 +1,34 @@
+{
+  "endpoints": [
+    {
+      "url": "http://localhost:8080",
+      "metrics": [
+        {
+          "name": "cpu_temperature",
+          "description": "CPU temperature",
+          "type": "gauge",
+          "json_path": "$.Reading",
+          "labels": {
+            "sensor": "cpu",
+            "location": "rack1"
+          }
+        }
+      ]
+    },
+    {
+      "url": "http://localhost:8080",
+      "metrics": [
+        {
+          "name": "memory_usage",
+          "description": "Memory usage %",
+          "type": "gauge",
+          "json_path": "$.Reading",
+          "labels": {
+            "sensor": "cpu",
+            "location": "rack1"
+          }
+        }
+      ]
+    }
+  ]
+}
