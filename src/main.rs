@@ -15,10 +15,10 @@ fn load_response() -> Value {
 fn main() {
     let config = config::config::load_config();
     init_metrics(&3000, &config);
-    let response = load_response();
 
     for endpoint in &config.endpoints {
         for metric in &endpoint.metrics {
+            let response = load_response();
             let path = JsonPath::from_str(metric.json_path.as_str()).unwrap();
             let val = path.find_slice(&response);
             let gauge = gauge!(metric.name.clone());
