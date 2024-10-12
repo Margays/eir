@@ -1,11 +1,13 @@
 use jsonpath_rust::JsonPath;
 use ::metrics::gauge;
 use metrics::init_metrics;
+use reqwest::Client;
 use serde_json::Value;
 use std::str::FromStr;
 
 mod metrics;
 mod config;
+mod client;
 
 fn load_response() -> Value {
     let response = std::fs::read_to_string("response.json").unwrap();
@@ -15,6 +17,8 @@ fn load_response() -> Value {
 fn main() {
     let config = config::config::load_config();
     init_metrics(&3000, &config);
+
+    let client = client::http::HttpClient::new();
 
     for endpoint in &config.endpoints {
         for metric in &endpoint.metrics {
