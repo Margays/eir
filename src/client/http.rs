@@ -31,6 +31,7 @@ impl Client for HttpClient {
             .headers(self.extra_headers.clone());
         let response = request.send();
         let json = response?.json()?;
+        println!("{:?}", json);
         Ok(json)
     }
 }

@@ -1,28 +1,21 @@
 {
+  "client": {
+    "headers": {
+      "Accept": "application/vnd.github+json",
+      "Authorization": "Bearer <token>",
+      "X-GitHub-Api-Version": "2022-11-28",
+      "User-Agent": "Prometheus"
+    }
+  },
   "endpoints": [
     {
-      "url": "http://localhost:8080",
+      "url": "https://api.github.com/rate_limit",
       "metrics": [
         {
-          "name": "cpu_temperature",
-          "description": "CPU temperature",
+          "name": "github_rate_limit_core_remaining",
+          "description": "Remaining core requests",
           "type": "gauge",
-          "json_path": "$.Reading",
-          "labels": {
-            "sensor": "cpu",
-            "location": "rack1"
-          }
-        }
-      ]
-    },
-    {
-      "url": "http://localhost:8080",
-      "metrics": [
-        {
-          "name": "memory_usage",
-          "description": "Memory usage %",
-          "type": "gauge",
-          "json_path": "$.Reading",
+          "json_path": "$.resources.core.remaining",
           "labels": {
             "sensor": "cpu",
             "location": "rack1"
