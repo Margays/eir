@@ -1,9 +1,11 @@
 use serde::Deserialize;
 
 use super::endpoint::Endpoint;
+use super::client::Client;
 
 #[derive(Deserialize,Debug)]
 pub struct Config {
+    pub client: Client,
     pub endpoints: Vec<Endpoint>
 }
 

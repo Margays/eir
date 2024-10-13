@@ -1,28 +1,29 @@
 use jsonpath_rust::JsonPath;
 use ::metrics::gauge;
 use metrics::init_metrics;
-use reqwest::Client;
-use serde_json::Value;
 use std::str::FromStr;
+use crate::client::client::Client;
 
 mod metrics;
 mod config;
 mod client;
 
-fn load_response() -> Value {
-    let response = std::fs::read_to_string("response.json").unwrap();
-    serde_json::from_str(&response).unwrap()
-}
+// fn load_response() -> Value {
+//     let response = std::fs::read_to_string("response.json").unwrap();
+//     serde_json::from_str(&response).unwrap()
+// }
 
 fn main() {
     let config = config::config::load_config();
     init_metrics(&3000, &config);
 
-    let client = client::http::HttpClient::new();
-
+    
+    let api_client = client::http::HttpClient::new(
+        &config.client.headers,
+    );
     for endpoint in &config.endpoints {
         for metric in &endpoint.metrics {
-            let response = load_response();
+            let response = api_client.get(endpoint.url.as_str()).unwrap();
             let path = JsonPath::from_str(metric.json_path.as_str()).unwrap();
             let val = path.find_slice(&response);
             let gauge = gauge!(metric.name.clone());
