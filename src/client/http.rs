@@ -1,4 +1,4 @@
-use super::client::Client;
+use super::Client;
 use reqwest::header::HeaderMap;
 use serde_json::Value;
 use std::{collections::HashMap, error::Error};
@@ -15,12 +15,12 @@ impl HttpClient {
         for (key, value) in headers {
             extra_headers.append(
                 reqwest::header::HeaderName::from_bytes(key.as_bytes()).unwrap(),
-                reqwest::header::HeaderValue::from_str(&value).unwrap(),
+                reqwest::header::HeaderValue::from_str(value).unwrap(),
             );
         }
         HttpClient {
-            api_client: api_client,
-            extra_headers: extra_headers,
+            api_client,
+            extra_headers,
         }
     }
 }

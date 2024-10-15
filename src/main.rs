@@ -1,4 +1,4 @@
-use crate::client::client::Client;
+use crate::client::Client;
 use crate::config::metric::Label;
 use ::metrics::gauge;
 use jsonpath_rust::JsonPath;
@@ -27,7 +27,7 @@ fn resolve_labels(labels: &Vec<Label>, response: &Value) -> Vec<(String, String)
 }
 
 fn main() {
-    let config = config::config::load_config();
+    let config = config::load_config();
     init_metrics(&3000, &config);
 
     let api_client = client::http::HttpClient::new(&config.client.headers);

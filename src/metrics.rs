@@ -4,8 +4,8 @@ use std::time::Duration;
 use metrics_exporter_prometheus::PrometheusBuilder;
 use metrics_util::MetricKindMask;
 
-use crate::config::config::Config;
 use crate::config::metric::MetricType;
+use crate::config::Config;
 
 pub fn init_metrics(port: &u16, config: &Config) {
     println!("initializing metrics exporter");
