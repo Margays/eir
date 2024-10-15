@@ -1,4 +1,4 @@
-pub mod config;
-pub mod metric;
-pub mod endpoint;
 pub mod client;
+pub mod config;
+pub mod endpoint;
+pub mod metric;

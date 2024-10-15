@@ -1,25 +1,25 @@
 use serde::{Deserialize, Deserializer};
 
-#[derive(Deserialize,Debug,Clone)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct Label {
     pub name: String,
-    pub value: String
+    pub value: String,
 }
 
-#[derive(Deserialize,Debug)]
+#[derive(Deserialize, Debug)]
 pub struct Metric {
     pub name: String,
     pub description: String,
     pub r#type: MetricType,
     pub json_path: String,
-    pub labels: Vec<Label>
+    pub labels: Vec<Label>,
 }
 
 #[derive(Debug)]
 pub enum MetricType {
     Counter,
     Gauge,
-    Histogram
+    Histogram,
 }
 
 impl<'de> Deserialize<'de> for MetricType {
@@ -32,7 +32,7 @@ impl<'de> Deserialize<'de> for MetricType {
             "counter" => MetricType::Counter,
             "gauge" => MetricType::Gauge,
             "Histogram" => MetricType::Histogram,
-            _ => panic!("Invalid metric type")
+            _ => panic!("Invalid metric type"),
         })
     }
 }

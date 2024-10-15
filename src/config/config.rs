@@ -1,12 +1,12 @@
 use serde::Deserialize;
 
-use super::endpoint::Endpoint;
 use super::client::Client;
+use super::endpoint::Endpoint;
 
-#[derive(Deserialize,Debug)]
+#[derive(Deserialize, Debug)]
 pub struct Config {
     pub client: Client,
-    pub endpoints: Vec<Endpoint>
+    pub endpoints: Vec<Endpoint>,
 }
 
 pub fn load_config() -> Config {

@@ -7,7 +7,6 @@ use metrics_util::MetricKindMask;
 use crate::config::config::Config;
 use crate::config::metric::MetricType;
 
-
 pub fn init_metrics(port: &u16, config: &Config) {
     println!("initializing metrics exporter");
 
@@ -27,23 +26,14 @@ pub fn init_metrics(port: &u16, config: &Config) {
         for metric in &endpoint.metrics {
             match metric.r#type {
                 MetricType::Counter => {
-                    metrics::describe_counter!(
-                        metric.name.clone(),
-                        metric.description.clone()
-                    );
-                },
+                    metrics::describe_counter!(metric.name.clone(), metric.description.clone());
+                }
                 MetricType::Gauge => {
-                    metrics::describe_gauge!(
-                        metric.name.clone(),
-                        metric.description.clone()
-                    );
-                },
+                    metrics::describe_gauge!(metric.name.clone(), metric.description.clone());
+                }
                 MetricType::Histogram => {
-                    metrics::describe_histogram!(
-                        metric.name.clone(),
-                        metric.description.clone()
-                    );
-                },
+                    metrics::describe_histogram!(metric.name.clone(), metric.description.clone());
+                }
             }
         }
     }
