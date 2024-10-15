@@ -5,7 +5,8 @@ RUN mkdir /app \
 WORKDIR /app/project
 COPY Cargo.toml /app/project/Cargo.toml
 COPY Cargo.lock /app/project/Cargo.lock
-RUN cargo build --release
+RUN cargo check \
+    && cargo build --release
 
 COPY src /app/project/src
 RUN cargo build --release
