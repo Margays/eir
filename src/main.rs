@@ -1,17 +1,30 @@
 use jsonpath_rust::JsonPath;
 use ::metrics::gauge;
 use metrics::init_metrics;
+use serde_json::Value;
 use std::str::FromStr;
 use crate::client::client::Client;
+use crate::config::metric::Label;
 
 mod metrics;
 mod config;
 mod client;
 
-// fn load_response() -> Value {
-//     let response = std::fs::read_to_string("response.json").unwrap();
-//     serde_json::from_str(&response).unwrap()
-// }
+fn resolve_labels(labels: &Vec<Label>, response: &Value) -> Vec<(String, String)> {
+    let mut resolved_labels = Vec::new();
+    for label in labels {
+        let name = label.name.clone();
+        let value = label.value.clone();
+        if value.starts_with("$") {
+            let path = JsonPath::from_str(value.as_str()).unwrap();
+            let val = path.find_slice(response);
+            resolved_labels.push((name, val[0].clone().to_data().to_string()));
+        } else {
+            resolved_labels.push((name, value));
+        }
+    }
+    resolved_labels
+}
 
 fn main() {
     let config = config::config::load_config();
@@ -26,8 +39,13 @@ fn main() {
             let response = api_client.get(endpoint.url.as_str()).unwrap();
             let path = JsonPath::from_str(metric.json_path.as_str()).unwrap();
             let val = path.find_slice(&response);
-            let gauge = gauge!(metric.name.clone());
-            gauge.set(val[0].clone().to_data().as_f64().unwrap());
+            let value = val[0].clone().to_data().as_f64().unwrap();
+            let labels = resolve_labels(
+                &metric.labels.clone(),
+                &response
+            );
+            let gauge = gauge!(metric.name.clone(), &labels);
+            gauge.set(value);
         }
     }
     std::thread::sleep(std::time::Duration::from_secs(60));

@@ -5,7 +5,7 @@ use metrics_exporter_prometheus::PrometheusBuilder;
 use metrics_util::MetricKindMask;
 
 use crate::config::config::Config;
-use crate::config::metric::{Metric, MetricType};
+use crate::config::metric::MetricType;
 
 
 pub fn init_metrics(port: &u16, config: &Config) {
@@ -21,35 +21,30 @@ pub fn init_metrics(port: &u16, config: &Config) {
             port.to_owned(),
         ))
         .install()
-        .expect("failed to install Prometheus recorder");
+        .expect("failed to install metrics exporter");
 
     for endpoint in &config.endpoints {
         for metric in &endpoint.metrics {
             match metric.r#type {
-                MetricType::Counter => register_counter(metric),
-                MetricType::Gauge => register_gauge(metric),
-                MetricType::Histogram => register_histogram(metric),
+                MetricType::Counter => {
+                    metrics::describe_counter!(
+                        metric.name.clone(),
+                        metric.description.clone()
+                    );
+                },
+                MetricType::Gauge => {
+                    metrics::describe_gauge!(
+                        metric.name.clone(),
+                        metric.description.clone()
+                    );
+                },
+                MetricType::Histogram => {
+                    metrics::describe_histogram!(
+                        metric.name.clone(),
+                        metric.description.clone()
+                    );
+                },
             }
         }
     }
-}
-
-/******** Utils ********/
-
-/// Registers a counter with the given name.
-fn register_counter(metric: &Metric) {
-    metrics::describe_counter!(metric.name.clone(), metric.description.clone());
-    let _counter = metrics::counter!(metric.name.clone());
-}
-
-/// Registers a gauge with the given name.
-fn register_gauge(metric: &Metric) {
-    metrics::describe_gauge!(metric.name.clone(), metric.description.clone());
-    let _gauge = ::metrics::gauge!(metric.name.clone());
-}
-
-/// Registers a histogram with the given name.
-fn register_histogram(metric: &Metric) {
-    metrics::describe_histogram!(metric.name.clone(), metric.description.clone());
-    let _histogram = ::metrics::histogram!(metric.name.clone());
 }

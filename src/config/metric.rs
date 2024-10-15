@@ -1,6 +1,10 @@
-use std::collections::HashMap;
-
 use serde::{Deserialize, Deserializer};
+
+#[derive(Deserialize,Debug,Clone)]
+pub struct Label {
+    pub name: String,
+    pub value: String
+}
 
 #[derive(Deserialize,Debug)]
 pub struct Metric {
@@ -8,7 +12,7 @@ pub struct Metric {
     pub description: String,
     pub r#type: MetricType,
     pub json_path: String,
-    pub labels: Option<HashMap<String, String>>
+    pub labels: Vec<Label>
 }
 
 #[derive(Debug)]
