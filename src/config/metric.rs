@@ -6,7 +6,7 @@ pub struct Label {
     pub value: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct Metric {
     pub name: String,
     pub description: String,
@@ -15,7 +15,7 @@ pub struct Metric {
     pub labels: Vec<Label>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum MetricType {
     Counter,
     Gauge,

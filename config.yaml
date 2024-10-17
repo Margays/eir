@@ -5,21 +5,29 @@
       "Authorization": "Bearer <token>",
       "X-GitHub-Api-Version": "2022-11-28",
       "User-Agent": "Prometheus"
-    }
+    },
+    "max_connections": 10,
   },
   "endpoints": [
     {
       "url": "https://api.github.com/rate_limit",
+      "interval": "1m",
       "metrics": [
         {
           "name": "github_rate_limit_core_remaining",
           "description": "Remaining core requests",
           "type": "gauge",
           "json_path": "$.resources.core.remaining",
-          "labels": {
-            "sensor": "cpu",
-            "location": "rack1"
-          }
+          "labels": [
+            {
+              "name": "resource",
+              "value": "$.resources.core.remaining"
+            },
+            {
+              "name": "static",
+              "value": "some_static_value"
+            }
+          ]
         }
       ]
     }
