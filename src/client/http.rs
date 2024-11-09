@@ -63,8 +63,8 @@ mod tests {
         let url = server.url();
 
         let headers: HashMap<String, String> = HashMap::new();
-        let client = HttpClient::new(&headers, max_connections);
-        
+        let client = Arc::new(HttpClient::new(&headers, max_connections));
+
         let mut set: JoinSet<Value> = JoinSet::new();
         for _ in 0..requests_count {
             let client = client.clone();
