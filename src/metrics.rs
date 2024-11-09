@@ -7,8 +7,9 @@ use metrics_util::MetricKindMask;
 use crate::config::metric::MetricType;
 use crate::config::Config;
 
-pub fn init_metrics(port: &u16, config: &Config) {
+pub fn init_metrics(config: &Config) {
     println!("initializing metrics exporter");
+    let port = config.exporter.port;
 
     PrometheusBuilder::new()
         .idle_timeout(

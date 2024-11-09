@@ -59,8 +59,8 @@ async fn fetch_metrics(client: Arc<client::http::HttpClient>, endpoint: Arc<Endp
 
 #[tokio::main]
 async fn main() {
-    let config = config::load_config();
-    init_metrics(&3000, &config);
+    let config = config::load_config("config.yaml");
+    init_metrics(&config);
 
     let _client = client::http::HttpClient::new(
         &config.client.headers,

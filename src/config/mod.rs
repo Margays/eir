@@ -1,6 +1,7 @@
 pub mod client;
 pub mod endpoint;
 pub mod metric;
+pub mod exporter;
 
 use serde::Deserialize;
 
@@ -8,10 +9,11 @@ use serde::Deserialize;
 pub struct Config {
     pub client: client::Client,
     pub endpoints: Vec<endpoint::Endpoint>,
+    pub exporter: exporter::Exporter,
 }
 
-pub fn load_config() -> Config {
-    let content = std::fs::read_to_string("config.yaml").unwrap();
+pub fn load_config(path: &str) -> Config {
+    let content = std::fs::read_to_string(path).unwrap();
     let config: Config = serde_yml::from_str(&content).unwrap();
     config
 }
