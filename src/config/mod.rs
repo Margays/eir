@@ -1,7 +1,7 @@
 pub mod client;
 pub mod endpoint;
-pub mod metric;
 pub mod exporter;
+pub mod metric;
 
 use serde::Deserialize;
 
