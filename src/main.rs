@@ -1,6 +1,6 @@
 use crate::client::Client;
 use crate::config::endpoint::Endpoint;
-use crate::config::metric::Label;
+use crate::config::metric::{Label, MetricType};
 use ::metrics::gauge;
 use jsonpath_rust::JsonPath;
 use metrics::init_metrics;
@@ -49,8 +49,20 @@ async fn fetch_metrics(client: Arc<client::http::HttpClient>, endpoint: Arc<Endp
             let val = path.find_slice(&response);
             let value = val[0].clone().to_data().as_f64().unwrap();
             let labels = resolve_labels(&metric.labels.clone(), &response);
-            let gauge = gauge!(metric.name.clone(), &labels);
-            gauge.set(value);
+            match &metric.r#type {
+                MetricType::Counter => {
+                    let counter = gauge!(metric.name.clone(), &labels);
+                    counter.set(value);
+                }
+                MetricType::Gauge => {
+                    let gauge = gauge!(metric.name.clone(), &labels);
+                    gauge.set(value);
+                }
+                MetricType::Histogram => {
+                    let histogram = gauge!(metric.name.clone(), &labels);
+                    histogram.set(value);
+                }
+            }
         }
         let interval = parse_interval(endpoint.interval.as_str());
         sleep(Duration::from_secs(interval)).await;
@@ -62,10 +74,8 @@ async fn main() {
     let config = config::load_config("config.yaml");
     init_metrics(&config);
 
-    let _client = client::http::HttpClient::new(
-        &config.client.headers,
-        config.client.max_connections,
-    );
+    let _client =
+        client::http::HttpClient::new(&config.client.headers, config.client.max_connections);
     let mut tasks = Vec::new();
     for endpoint in &config.endpoints {
         let endpoint = Arc::new(endpoint.clone());

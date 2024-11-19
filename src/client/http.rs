@@ -1,9 +1,9 @@
 use super::Client;
 use reqwest::header::HeaderMap;
 use serde_json::Value;
+use std::sync::Arc;
 use std::{collections::HashMap, error::Error};
 use tokio::sync::Semaphore;
-use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct HttpClient {
@@ -54,28 +54,28 @@ mod tests {
         let requests_count = 100;
         let max_connections = 10;
         let mut server = Server::new_async().await;
-        let mock = server.mock("GET", "/test")
+        let mock = server
+            .mock("GET", "/test")
             .with_status(200)
             .with_header("content-type", "application/json")
             .with_body(r#"{"test": "test"}"#)
-            .create_async().await;
+            .create_async()
+            .await;
 
         let url = server.url();
 
         let headers: HashMap<String, String> = HashMap::new();
-        let client = HttpClient::new(&headers, max_connections);
-        
+        let client = Arc::new(HttpClient::new(&headers, max_connections));
+
         let mut set: JoinSet<Value> = JoinSet::new();
         for _ in 0..requests_count {
             let client = client.clone();
             let url = url.clone();
-            set.spawn(async move {
-                client.get(&format!("{}/test", url)).await.unwrap()
-            });
+            set.spawn(async move { client.get(&format!("{}/test", url)).await.unwrap() });
         }
         while let Some(out) = set.join_next().await {
-           let response = out.unwrap();
-           assert_eq!(response["test"], "test");
+            let response = out.unwrap();
+            assert_eq!(response["test"], "test");
         }
         mock.expect(requests_count).assert();
     }
