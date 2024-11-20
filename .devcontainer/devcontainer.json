@@ -1,0 +1,31 @@
+{
+    "name": "Codespaces Rust",
+    "hostRequirements": {
+        "cpus": 2,
+        "memory": "8gb",
+        "storage": "32gb"
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/rust:1": {
+            "version": "latest"
+        }
+    },
+    "customizations": {
+        "codespaces": {
+            "openFiles": [
+                "src/main.rs"
+            ]
+        },
+        "vscode": {
+            "extensions": [
+                "GitHub.copilot",
+                "GitHub.copilot-chat",
+                "rust-lang.rust-analyzer"
+            ],
+            "settings": {
+                "editor.formatOnSave": true,
+                "terminal.integrated.shell.linux": "/usr/bin/bash"
+            }
+        }
+    }
+}
