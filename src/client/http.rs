@@ -80,7 +80,7 @@ mod tests {
         for _ in 0..requests_count {
             let client = client.clone();
             let url = url.clone();
-            set.spawn(async move { client.get(&format!("{}/test", url)).await.unwrap() });
+            set.spawn(async move { client.get(&format!("{url}/test")).await.unwrap() });
         }
         while let Some(out) = set.join_next().await {
             let response = out.unwrap();

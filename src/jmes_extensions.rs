@@ -53,7 +53,7 @@ fn to_timestamp(args: &[Rcvar], ctx: &mut Context<'_>) -> Result<Rcvar, Jmespath
         JmespathError::from_ctx(
             ctx,
             ErrorReason::Runtime(RuntimeError::InvalidType {
-                expected: format!("date with pattern '{}'", pattern),
+                expected: format!("date with pattern '{pattern}'"),
                 actual: args[0].as_string().unwrap().to_string(),
                 position: 0,
             }),
