@@ -11,7 +11,7 @@ pub struct Metric {
     pub name: String,
     pub description: String,
     pub r#type: MetricType,
-    pub json_path: String,
+    pub jmes_expression: String,
     pub labels: Vec<Label>,
 }
 

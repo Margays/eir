@@ -2,29 +2,33 @@ use crate::client::Client;
 use crate::config::endpoint::Endpoint;
 use crate::config::metric::{Label, MetricType};
 use ::metrics::gauge;
-use jsonpath_rust::JsonPath;
 use metrics::init_metrics;
 use serde_json::Value;
-use std::str::FromStr;
 use std::sync::Arc;
-use tokio::time::{sleep, Duration};
+use tokio::time::{Duration, sleep};
 
 mod client;
 mod config;
+mod jmes_extensions;
 mod metrics;
+
+fn extract_value(data: &Value, path: &str) -> String {
+    if path.starts_with("{{") && path.ends_with("}}") {
+        let jmes_path = crate::jmes_extensions::compile(&path[2..path.len() - 2]).unwrap();
+        let jmes_value = jmespath::Variable::from_serializable(data).unwrap();
+        let value = jmes_path.search(&jmes_value).unwrap();
+        value.to_string()
+    } else {
+        path.to_string()
+    }
+}
 
 fn resolve_labels(labels: &Vec<Label>, response: &Value) -> Vec<(String, String)> {
     let mut resolved_labels = Vec::new();
     for label in labels {
         let name = label.name.clone();
         let value = label.value.clone();
-        if value.starts_with("$") {
-            let path = JsonPath::from_str(value.as_str()).unwrap();
-            let val = path.find_slice(response);
-            resolved_labels.push((name, val[0].clone().to_data().to_string()));
-        } else {
-            resolved_labels.push((name, value));
-        }
+        resolved_labels.push((name, extract_value(response, &value)));
     }
     resolved_labels
 }
@@ -45,9 +49,8 @@ async fn fetch_metrics(client: Arc<client::http::HttpClient>, endpoint: Arc<Endp
     loop {
         let response = client.get(endpoint.url.as_str()).await.unwrap();
         for metric in &endpoint.metrics {
-            let path = JsonPath::from_str(metric.json_path.as_str()).unwrap();
-            let val = path.find_slice(&response);
-            let value = val[0].clone().to_data().as_f64().unwrap();
+            let raw_value = extract_value(&response, &metric.jmes_expression);
+            let value: f64 = raw_value.parse().unwrap();
             let labels = resolve_labels(&metric.labels.clone(), &response);
             match &metric.r#type {
                 MetricType::Counter => {
@@ -71,15 +74,15 @@ async fn fetch_metrics(client: Arc<client::http::HttpClient>, endpoint: Arc<Endp
 
 #[tokio::main]
 async fn main() {
-    let config = config::load_config("config.yaml");
+    let config = config::load_config("config.json");
     init_metrics(&config);
 
-    let _client =
+    let http_client =
         client::http::HttpClient::new(&config.client.headers, config.client.max_connections);
     let mut tasks = Vec::new();
     for endpoint in &config.endpoints {
         let endpoint = Arc::new(endpoint.clone());
-        let client = Arc::new(_client.clone());
+        let client = Arc::new(http_client.clone());
         let task = tokio::spawn(async move {
             fetch_metrics(client, endpoint).await;
         });

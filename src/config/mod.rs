@@ -14,6 +14,6 @@ pub struct Config {
 
 pub fn load_config(path: &str) -> Config {
     let content = std::fs::read_to_string(path).unwrap();
-    let config: Config = serde_yml::from_str(&content).unwrap();
+    let config: Config = serde_json::from_str(&content).unwrap();
     config
 }

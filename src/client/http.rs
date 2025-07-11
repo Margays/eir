@@ -1,6 +1,6 @@
 use super::Client;
 use reqwest::header::HeaderMap;
-use serde_json::Value;
+use serde_json::{Value, json};
 use std::sync::Arc;
 use std::{collections::HashMap, error::Error};
 use tokio::sync::Semaphore;
@@ -36,8 +36,17 @@ impl Client for HttpClient {
         let permit = self.semaphore.acquire().await.unwrap();
         let response = request.send().await?;
         drop(permit);
-        let json = response.json().await?;
-        Ok(json)
+        let headers: Value = response
+            .headers()
+            .iter()
+            .map(|(k, v)| (k.as_str().to_string(), v.to_str().unwrap_or("").to_string()))
+            .collect();
+        let json_data: Value = response.json().await?;
+        let result: Value = json!({
+            "headers": headers,
+            "json": json_data
+        });
+        Ok(result)
     }
 }
 
@@ -75,7 +84,7 @@ mod tests {
         }
         while let Some(out) = set.join_next().await {
             let response = out.unwrap();
-            assert_eq!(response["test"], "test");
+            assert_eq!(response["json"]["test"], "test");
         }
         mock.expect(requests_count).assert();
     }
