@@ -1,4 +1,4 @@
-use serde::{Deserialize, Deserializer};
+use serde::Deserialize;
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct Label {
@@ -15,24 +15,10 @@ pub struct Metric {
     pub labels: Vec<Label>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Deserialize, Debug, Clone)]
+#[serde(rename_all = "lowercase")]
 pub enum MetricType {
     Counter,
     Gauge,
     Histogram,
-}
-
-impl<'de> Deserialize<'de> for MetricType {
-    fn deserialize<D>(de: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let metric_type = String::deserialize(de)?;
-        Ok(match metric_type.as_str() {
-            "counter" => MetricType::Counter,
-            "gauge" => MetricType::Gauge,
-            "Histogram" => MetricType::Histogram,
-            _ => panic!("Invalid metric type"),
-        })
-    }
 }
