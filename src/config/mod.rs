@@ -17,3 +17,16 @@ pub fn load_config(path: &str) -> Config {
     let config: Config = serde_json::from_str(&content).unwrap();
     config
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_load_config() {
+        let config = load_config("config.json");
+        assert!(!config.endpoints.is_empty());
+        assert_eq!(config.exporter.port, 3000);
+        assert!(!config.client.headers.is_empty());
+    }
+}

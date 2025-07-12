@@ -29,7 +29,7 @@
           "name": "github_token_expiration",
           "description": "Token expiration time in seconds",
           "type": "gauge",
-          "jmes_expression": "{{to_timestamp(headers.\"github-authentication-token-expiration\")}}",
+          "jmes_expression": "{{to_timestamp(replace(headers.\"github-authentication-token-expiration\", 'UTC', '+00:00'), '%Y-%m-%d %H:%M:%S %z')}}",
           "labels": [
             {
               "name": "static",
