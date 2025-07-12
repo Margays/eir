@@ -16,6 +16,7 @@ reqwest = { version = "0.12.22", features = ["json"]}
 tokio = { version = "1.46.1", features = ["full"]}
 chrono = "0.4.41"
 jmespath = "0.4.0"
+clap = { version = "4.5.41", features = ["derive", "env"] }
 
 [dev-dependencies]
 mockito = "1.7.0"

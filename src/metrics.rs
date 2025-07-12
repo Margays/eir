@@ -7,19 +7,15 @@ use metrics_util::MetricKindMask;
 use crate::config::Config;
 use crate::config::metric::MetricType;
 
-pub fn init_metrics(config: &Config) {
+pub fn init_metrics(config: &Config, port: u16) {
     println!("initializing metrics exporter");
-    let port = config.exporter.port;
 
     PrometheusBuilder::new()
         .idle_timeout(
             MetricKindMask::COUNTER | MetricKindMask::HISTOGRAM,
             Some(Duration::from_secs(10)),
         )
-        .with_http_listener(SocketAddr::new(
-            IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)),
-            port.to_owned(),
-        ))
+        .with_http_listener(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), port))
         .install()
         .expect("failed to install metrics exporter");
 
