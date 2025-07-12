@@ -13,8 +13,7 @@ pub struct Config {
 pub fn load_config(path: &str) -> Config {
     let file = std::fs::File::open(path).unwrap();
     let reader = std::io::BufReader::new(file);
-    let config = serde_json::from_reader(reader).unwrap();
-    config
+    serde_json::from_reader(reader).unwrap()
 }
 
 #[cfg(test)]
