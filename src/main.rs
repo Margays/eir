@@ -2,6 +2,7 @@ use crate::client::Client;
 use crate::config::endpoint::Endpoint;
 use crate::config::metric::{Label, MetricType};
 use ::metrics::gauge;
+use clap::Parser;
 use metrics::init_metrics;
 use serde_json::Value;
 use std::sync::Arc;
@@ -49,7 +50,7 @@ async fn fetch_metrics(client: Arc<client::http::HttpClient>, endpoint: Arc<Endp
     loop {
         let response = client.get(endpoint.url.as_str()).await.unwrap();
         for metric in &endpoint.metrics {
-            let raw_value = extract_value(&response, &metric.jmes_expression);
+            let raw_value = extract_value(&response, &metric.value);
             let value: f64 = raw_value.parse().unwrap();
             let labels = resolve_labels(&metric.labels.clone(), &response);
             match &metric.r#type {
@@ -72,17 +73,38 @@ async fn fetch_metrics(client: Arc<client::http::HttpClient>, endpoint: Arc<Endp
     }
 }
 
+#[derive(Parser, Debug)]
+#[clap(name = "Metrics Collector", version, author)]
+struct CommandLineArgs {
+    #[clap(
+        short,
+        long,
+        default_value = "config.json",
+        env = "EXPORTER_CONFIG_PATH"
+    )]
+    /// Path to the configuration file
+    config_path: String,
+    #[clap(short, long, default_value = "3000", env = "EXPORTER_PORT")]
+    /// Port to run the HTTP server on (optional)
+    port: u16,
+}
+
 #[tokio::main]
 async fn main() {
-    let config = config::load_config("config.json");
-    init_metrics(&config);
+    let args = CommandLineArgs::parse();
+    println!("Using configuration file: {}", args.config_path);
+    let config = config::load_config(&args.config_path);
 
-    let http_client =
-        client::http::HttpClient::new(&config.client.headers, config.client.max_connections);
+    init_metrics(&config, args.port);
+
+    let http_client = Arc::new(client::http::HttpClient::new(
+        &config.client.headers,
+        config.client.max_connections,
+    ));
     let mut tasks = Vec::new();
     for endpoint in &config.endpoints {
         let endpoint = Arc::new(endpoint.clone());
-        let client = Arc::new(http_client.clone());
+        let client = http_client.clone();
         let task = tokio::spawn(async move {
             fetch_metrics(client, endpoint).await;
         });

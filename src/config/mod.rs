@@ -1,6 +1,5 @@
 pub mod client;
 pub mod endpoint;
-pub mod exporter;
 pub mod metric;
 
 use serde::Deserialize;
@@ -9,12 +8,12 @@ use serde::Deserialize;
 pub struct Config {
     pub client: client::Client,
     pub endpoints: Vec<endpoint::Endpoint>,
-    pub exporter: exporter::Exporter,
 }
 
 pub fn load_config(path: &str) -> Config {
-    let content = std::fs::read_to_string(path).unwrap();
-    let config: Config = serde_json::from_str(&content).unwrap();
+    let file = std::fs::File::open(path).unwrap();
+    let reader = std::io::BufReader::new(file);
+    let config = serde_json::from_reader(reader).unwrap();
     config
 }
 
@@ -26,7 +25,6 @@ mod tests {
     fn test_load_config() {
         let config = load_config("config.json");
         assert!(!config.endpoints.is_empty());
-        assert_eq!(config.exporter.port, 3000);
         assert!(!config.client.headers.is_empty());
     }
 }
