@@ -22,7 +22,7 @@ cargo build --release
 
 ### Run
 ```sh
-cargo run --
+cargo run
 ```
 
 ### Configuration
