@@ -1,0 +1,17 @@
+replicaCount: 1
+
+image:
+  repository: eir
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 3000
+
+resources: {}
+
+env: []
+
+config:
+  configPath: config.json

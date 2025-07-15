@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "eir.fullname" . }}
+  labels:
+    app: {{ include "eir.name" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "eir.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "eir.name" . }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: EXPORTER_CONFIG_PATH
+              value: {{ .Values.config.configPath | quote }}
+            - name: EXPORTER_PORT
+              value: {{ .Values.service.port | quote }}
+{{- range .Values.env }}
+            - name: {{ .name }}
+              value: {{ .value | quote }}
+{{- end }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          resources: {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config.json
+              subPath: config.json
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ include "eir.fullname" . }}-config
