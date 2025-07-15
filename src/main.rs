@@ -4,7 +4,8 @@ use crate::config::metric::{Label, MetricType};
 use ::metrics::gauge;
 use clap::Parser;
 use metrics::init_metrics;
-use serde_json::Value;
+use serde_json::{Value, json};
+use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::time::{Duration, sleep};
 
@@ -13,23 +14,24 @@ mod config;
 mod jmes_extensions;
 mod metrics;
 
-fn extract_value(data: &Value, path: &str) -> String {
-    if path.starts_with("{{") && path.ends_with("}}") {
-        let jmes_path = crate::jmes_extensions::compile(&path[2..path.len() - 2]).unwrap();
+fn extract_value(data: &Value, value: &str) -> String {
+    let prefix = "jmespath:";
+    if let Some(expression) = value.strip_prefix(prefix) {
+        let jmes_path = crate::jmes_extensions::compile(expression).unwrap();
         let jmes_value = jmespath::Variable::from_serializable(data).unwrap();
-        let value = jmes_path.search(&jmes_value).unwrap();
-        value.to_string()
+        let extracted_value = jmes_path.search(&jmes_value).unwrap();
+        extracted_value.to_string()
     } else {
-        path.to_string()
+        value.to_string()
     }
 }
 
-fn resolve_labels(labels: &Vec<Label>, response: &Value) -> Vec<(String, String)> {
-    let mut resolved_labels = Vec::new();
+fn resolve_labels(labels: &Vec<Label>, response: &Value) -> HashMap<String, String> {
+    let mut resolved_labels = HashMap::new();
     for label in labels {
         let name = label.name.clone();
-        let value = label.value.clone();
-        resolved_labels.push((name, extract_value(response, &value)));
+        let value = extract_value(response, &label.value);
+        resolved_labels.insert(name, value);
     }
     resolved_labels
 }
@@ -46,13 +48,32 @@ fn parse_interval(interval: &str) -> u64 {
     }
 }
 
-async fn fetch_metrics(client: Arc<client::http::HttpClient>, endpoint: Arc<Endpoint>) {
+fn add_env_args(response: &mut Value) {
+    let env = std::env::vars_os();
+    let mut env_vars = json!({});
+    for (key, value) in env {
+        if let Ok(key_str) = key.into_string() {
+            if let Ok(value_str) = value.into_string() {
+                env_vars[key_str] = json!(value_str);
+            }
+        }
+    }
+    response["env"] = env_vars;
+}
+
+async fn fetch_metrics(
+    client_name: String,
+    client: Arc<client::http::HttpClient>,
+    endpoint: Arc<Endpoint>,
+) {
     loop {
-        let response = client.get(endpoint.url.as_str()).await.unwrap();
+        let mut response = client.get(endpoint.url.as_str()).await.unwrap();
+        add_env_args(&mut response);
         for metric in &endpoint.metrics {
             let raw_value = extract_value(&response, &metric.value);
             let value: f64 = raw_value.parse().unwrap();
-            let labels = resolve_labels(&metric.labels.clone(), &response);
+            let mut labels = resolve_labels(&metric.labels.clone(), &response);
+            labels.insert("client".to_string(), client_name.clone());
             match &metric.r#type {
                 MetricType::Counter => {
                     let counter = gauge!(metric.name.clone(), &labels);
@@ -71,6 +92,20 @@ async fn fetch_metrics(client: Arc<client::http::HttpClient>, endpoint: Arc<Endp
         let interval = parse_interval(endpoint.interval.as_str());
         sleep(Duration::from_secs(interval)).await;
     }
+}
+
+fn create_clients(config: &config::Config) -> HashMap<String, Arc<client::http::HttpClient>> {
+    config
+        .clients
+        .iter()
+        .map(|(name, client)| {
+            let http_client = Arc::new(client::http::HttpClient::new(
+                &client.headers,
+                client.max_connections,
+            ));
+            (name.clone(), http_client)
+        })
+        .collect()
 }
 
 #[derive(Parser, Debug)]
@@ -93,22 +128,29 @@ struct CommandLineArgs {
 async fn main() {
     let args = CommandLineArgs::parse();
     println!("Using configuration file: {}", args.config_path);
-    let config = config::load_config(&args.config_path);
+    let file = std::fs::File::open(&args.config_path).expect("Failed to open config file");
+    let config: config::Config = config::Config::from(file);
 
     init_metrics(&config, args.port);
 
-    let http_client = Arc::new(client::http::HttpClient::new(
-        &config.client.headers,
-        config.client.max_connections,
-    ));
+    let http_clients = create_clients(&config);
     let mut tasks = Vec::new();
-    for endpoint in &config.endpoints {
-        let endpoint = Arc::new(endpoint.clone());
-        let client = http_client.clone();
-        let task = tokio::spawn(async move {
-            fetch_metrics(client, endpoint).await;
-        });
-        tasks.push(task);
+    for (name, context) in &config.contexts {
+        let client = http_clients.get(&context.client).expect("Client not found");
+        for group_name in &context.endpoint_groups {
+            let endpoints = config
+                .get_endpoint_group(group_name)
+                .expect("Endpoint group not found");
+            for endpoint in endpoints {
+                let client_name = name.clone();
+                let endpoint = Arc::new(endpoint.clone());
+                let client = Arc::clone(client);
+                let task = tokio::spawn(async move {
+                    fetch_metrics(client_name, client, endpoint).await;
+                });
+                tasks.push(task);
+            }
+        }
     }
 
     for task in tasks {

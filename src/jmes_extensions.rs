@@ -2,7 +2,7 @@ use std::sync::LazyLock;
 
 use chrono::DateTime;
 use jmespath::{
-    Context, ErrorReason, Expression, JmespathError, Rcvar, Runtime, RuntimeError, Variable,
+    Context, ErrorReason, Expression, JmespathError, Rcvar, Runtime, Variable,
     functions::{ArgumentType, CustomFunction, Signature},
 };
 use serde_json::Number;
@@ -48,11 +48,9 @@ fn to_timestamp(args: &[Rcvar], ctx: &mut Context<'_>) -> Result<Rcvar, Jmespath
     let date = DateTime::parse_from_str(utc_date_str, pattern).map_err(|_| {
         JmespathError::from_ctx(
             ctx,
-            ErrorReason::Runtime(RuntimeError::InvalidType {
-                expected: format!("date with pattern '{pattern}'"),
-                actual: args[0].as_string().unwrap().to_string(),
-                position: 0,
-            }),
+            ErrorReason::Parse(format!(
+                "expected date with pattern '{pattern}' but got '{utc_date_str}'"
+            )),
         )
     })?;
 
