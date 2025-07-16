@@ -11,6 +11,5 @@ RUN cargo build --release
 FROM gcr.io/distroless/cc-debian12
 COPY LICENSE /LICENSE
 COPY --from=builder /app/project/target/release/eir /eir
-COPY config.json /config.json
 EXPOSE 3000
 CMD ["/eir"]
