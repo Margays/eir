@@ -50,7 +50,7 @@ jobs:
 
   push_to_registry:
     needs: [create_release]
-    name: Push Docker image to Docker Hub
+    name: Docker Hub Release
     runs-on: ubuntu-latest
     permissions:
       packages: write
