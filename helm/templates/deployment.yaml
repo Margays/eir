@@ -5,7 +5,7 @@ metadata:
   labels:
     app: {{ include "eir.name" . }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
       app: {{ include "eir.name" . }}
@@ -19,8 +19,8 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: EXPORTER_CONFIG_PATH
-              value: {{ .Values.config.configPath | quote }}
+            - name: EXPORTER_CONFIG_DIR
+              value: /configs
             - name: EXPORTER_PORT
               value: {{ .Values.service.port | quote }}
 {{- range .Values.env }}
@@ -31,10 +31,19 @@ spec:
             - containerPort: {{ .Values.service.port }}
           resources: {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - name: config-volume
-              mountPath: /app/config.json
-              subPath: config.json
+            - name: clients-volume
+              mountPath: "/configs/clients/"
+            - name: endpoint-groups-volume
+              mountPath: "/configs/endpoint_groups/"
+            - name: contexts-volume
+              mountPath: "/configs/contexts/"
       volumes:
-        - name: config-volume
+        - name: clients-volume
+          secret:
+            secretName: {{ include "eir.fullname" . }}-clients-config
+        - name: endpoint-groups-volume
           configMap:
-            name: {{ include "eir.fullname" . }}-config
+            name: {{ include "eir.fullname" . }}-endpoint-groups-config
+        - name: contexts-volume
+          configMap:
+            name: {{ include "eir.fullname" . }}-contexts-config

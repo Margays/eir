@@ -6,6 +6,7 @@ use clap::Parser;
 use metrics::init_metrics;
 use serde_json::{Value, json};
 use std::collections::HashMap;
+use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::time::{Duration, sleep};
 
@@ -111,14 +112,9 @@ fn create_clients(config: &config::Config) -> HashMap<String, Arc<client::http::
 #[derive(Parser, Debug)]
 #[clap(name = "Metrics Collector", version, author)]
 struct CommandLineArgs {
-    #[clap(
-        short,
-        long,
-        default_value = "config.json",
-        env = "EXPORTER_CONFIG_PATH"
-    )]
-    /// Path to the configuration file
-    config_path: String,
+    #[clap(short, long, default_value = "/configs", env = "EXPORTER_CONFIGS_DIR")]
+    /// Path to the configuration directory
+    configs_dir: String,
     #[clap(short, long, default_value = "3000", env = "EXPORTER_PORT")]
     /// Port to run the HTTP server on (optional)
     port: u16,
@@ -127,9 +123,11 @@ struct CommandLineArgs {
 #[tokio::main]
 async fn main() {
     let args = CommandLineArgs::parse();
-    println!("Using configuration file: {}", args.config_path);
-    let file = std::fs::File::open(&args.config_path).expect("Failed to open config file");
-    let config: config::Config = config::Config::from(file);
+    println!(
+        "Using configuration files from configuration dir: {}",
+        args.configs_dir
+    );
+    let config: config::Config = config::Config::from(&PathBuf::from(args.configs_dir));
 
     init_metrics(&config, args.port);
 

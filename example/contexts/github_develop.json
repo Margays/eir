@@ -1,0 +1,6 @@
+{
+    "client": "develop",
+    "endpoint_groups": [
+        "github"
+    ]
+}
