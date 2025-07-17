@@ -1,7 +1,7 @@
 use crate::client::Client;
 use crate::config::endpoint::Endpoint;
 use crate::config::metric::{Label, MetricType};
-use ::metrics::gauge;
+use ::metrics::{counter, gauge, histogram};
 use clap::Parser;
 use metrics::init_metrics;
 use serde_json::{Value, json};
@@ -77,16 +77,16 @@ async fn fetch_metrics(
             labels.insert("client".to_string(), client_name.clone());
             match &metric.r#type {
                 MetricType::Counter => {
-                    let counter = gauge!(metric.name.clone(), &labels);
-                    counter.set(value);
+                    let counter = counter!(metric.name.clone(), &labels);
+                    counter.absolute(value as u64);
                 }
                 MetricType::Gauge => {
                     let gauge = gauge!(metric.name.clone(), &labels);
                     gauge.set(value);
                 }
                 MetricType::Histogram => {
-                    let histogram = gauge!(metric.name.clone(), &labels);
-                    histogram.set(value);
+                    let histogram = histogram!(metric.name.clone(), &labels);
+                    histogram.record(value);
                 }
             }
         }
@@ -128,6 +128,10 @@ async fn main() {
         args.configs_dir
     );
     let config: config::Config = config::Config::from(&PathBuf::from(args.configs_dir));
+    if !config.validate() {
+        eprintln!("No valid configuration found. Exiting.");
+        return;
+    }
 
     init_metrics(&config, args.port);
 
