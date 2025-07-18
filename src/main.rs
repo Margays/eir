@@ -128,9 +128,9 @@ async fn main() {
         args.configs_dir
     );
     let config: config::Config = config::Config::from(&PathBuf::from(args.configs_dir));
-    if !config.validate() {
-        eprintln!("No valid configuration found. Exiting.");
-        return;
+    while config.validate() == false {
+        eprintln!("Configuration validation failed. Retrying in 5 seconds...");
+        sleep(Duration::from_secs(5)).await;
     }
 
     init_metrics(&config, args.port);
