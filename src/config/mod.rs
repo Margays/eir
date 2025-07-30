@@ -4,6 +4,7 @@ pub mod metric;
 
 use std::{collections::HashMap, path::PathBuf};
 
+use log::warn;
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
@@ -34,7 +35,7 @@ impl Config {
     {
         let mut entries: HashMap<String, T> = HashMap::new();
         if !dir.exists() || !dir.is_dir() {
-            eprintln!(
+            warn!(
                 "Directory does not exist or is not a directory: {}",
                 dir.display()
             );

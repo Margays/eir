@@ -1,6 +1,7 @@
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::time::Duration;
 
+use log::info;
 use metrics_exporter_prometheus::PrometheusBuilder;
 use metrics_util::MetricKindMask;
 
@@ -8,7 +9,7 @@ use crate::config::Config;
 use crate::config::metric::MetricType;
 
 pub fn init_metrics(config: &Config, port: u16) {
-    println!("initializing metrics exporter");
+    info!("initializing metrics exporter");
 
     PrometheusBuilder::new()
         .idle_timeout(

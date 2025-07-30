@@ -435,6 +435,7 @@ dependencies = [
  "clap",
  "jmespath",
  "jsonpath-rust",
+ "log",
  "metrics",
  "metrics-exporter-prometheus",
  "metrics-util",

@@ -3,6 +3,7 @@ use crate::config::endpoint::Endpoint;
 use crate::config::metric::{Label, MetricType};
 use ::metrics::{counter, gauge, histogram};
 use clap::Parser;
+use log::{info, warn};
 use metrics::init_metrics;
 use serde_json::{Value, json};
 use std::collections::HashMap;
@@ -123,13 +124,13 @@ struct CommandLineArgs {
 #[tokio::main]
 async fn main() {
     let args = CommandLineArgs::parse();
-    println!(
+    info!(
         "Using configuration files from configuration dir: {}",
         args.configs_dir
     );
     let config: config::Config = config::Config::from(&PathBuf::from(args.configs_dir));
-    while config.validate() == false {
-        eprintln!("Configuration validation failed. Retrying in 5 seconds...");
+    while !config.validate() {
+        warn!("Configuration validation failed. Retrying in 5 seconds...");
         sleep(Duration::from_secs(5)).await;
     }
 
