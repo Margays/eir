@@ -1,19 +1,19 @@
 {
     "name": "Rust",
-	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+    // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
     "build": {
-		"context": "..",
-		"dockerfile": "../Dockerfile",
+        "context": "..",
+        "dockerfile": "../Dockerfile",
         "target": "workspace",
-		"args": {
-			"REMOTE_USER": "${localEnv:USER}",
-			"REMOTE_UID": "${localEnv:REMOTE_UID:1000}",
-			"REMOTE_GID": "${localEnv:REMOTE_GID:1000}"
-		}
-	},
-	"mounts": [
-    	"type=bind,source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/${localEnv:USER}/.ssh,readonly"
-	],
+        "args": {
+            "REMOTE_USER": "${localEnv:USER}",
+            "REMOTE_UID": "${localEnv:REMOTE_UID:1000}",
+            "REMOTE_GID": "${localEnv:REMOTE_GID:1000}"
+        }
+    },
+    "mounts": [
+        "type=bind,source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/${localEnv:USER}/.ssh,readonly"
+    ],
     "hostRequirements": {
         "cpus": 2,
         "memory": "8gb",
