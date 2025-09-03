@@ -1,6 +1,14 @@
 FROM rust:1.88 as base
 
 FROM base AS workspace
+ARG REMOTE_USER
+ARG REMOTE_UID
+ARG REMOTE_GID
+RUN addgroup --gid ${REMOTE_GID} ${REMOTE_USER}
+RUN adduser --disabled-password --uid ${REMOTE_UID} --gid ${REMOTE_GID} ${REMOTE_USER}
+ENV HOME /home/${REMOTE_USER}
+ENV LC_ALL=C.UTF-8
+USER ${REMOTE_USER}
 
 FROM base as builder
 RUN mkdir /app && cd /app && USER=root cargo new project
