@@ -118,15 +118,15 @@ jobs:
 
       - name: Copy Helm chart
         run: |
-          rm -rf ./charts/eir
-          mkdir ./charts/eir
-          cp -R ./source/helm/* ./charts/eir/
+          rm -rf ./charts/charts/eir
+          mkdir ./charts/charts/eir
+          cp -R ./source/helm/* ./charts/charts/eir/
 
       - name: Update Helm chart version
         env:
           TAG_VERSION: ${{ github.ref_name }}
         run: |
-          cd ./charts/eir
+          cd ./charts/charts/eir
           # remove v prefix from version
           sed -i "s/^version: .*/version: ${TAG_VERSION#v}/" Chart.yaml
           sed -i "s/^appVersion: .*/appVersion: $TAG_VERSION/" Chart.yaml
