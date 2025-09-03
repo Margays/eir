@@ -120,7 +120,7 @@ jobs:
         run: |
           rm -rf ./charts/eir
           mkdir ./charts/eir
-          cp -R ./helm/* ./charts/eir/
+          cp -R ./source/helm/* ./charts/eir/
 
       - name: Update Helm chart version
         env:
