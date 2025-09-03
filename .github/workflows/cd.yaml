@@ -129,7 +129,7 @@ jobs:
           cd ./charts/charts/eir
           yq eval -i '.version = (strenv(TAG_VERSION) | sub("v"; ""))' Chart.yaml
           yq eval -i '.appVersion = strenv(TAG_VERSION)' Chart.yaml
-          yq eval -i 'image.tag = strenv(TAG_VERSION)' values.yaml
+          yq eval -i '.image.tag = strenv(TAG_VERSION)' values.yaml
 
       - name: Publish chart
         run: |
