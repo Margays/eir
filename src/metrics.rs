@@ -21,21 +21,16 @@ pub fn init_metrics(config: &Config, port: u16) {
         .expect("failed to install metrics exporter");
 
     for endpoint_group in config.endpoint_groups.values() {
-        for endpoint in endpoint_group {
-            for metric in &endpoint.metrics {
-                match metric.r#type {
-                    MetricType::Counter => {
-                        metrics::describe_counter!(metric.name.clone(), metric.description.clone());
-                    }
-                    MetricType::Gauge => {
-                        metrics::describe_gauge!(metric.name.clone(), metric.description.clone());
-                    }
-                    MetricType::Histogram => {
-                        metrics::describe_histogram!(
-                            metric.name.clone(),
-                            metric.description.clone()
-                        );
-                    }
+        for metric in &endpoint_group.metrics {
+            match metric.r#type {
+                MetricType::Counter => {
+                    metrics::describe_counter!(metric.name.clone(), metric.description.clone());
+                }
+                MetricType::Gauge => {
+                    metrics::describe_gauge!(metric.name.clone(), metric.description.clone());
+                }
+                MetricType::Histogram => {
+                    metrics::describe_histogram!(metric.name.clone(), metric.description.clone());
                 }
             }
         }

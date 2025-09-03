@@ -16,12 +16,12 @@ pub struct Context {
 #[derive(Deserialize, Debug, Default)]
 pub struct Config {
     pub clients: HashMap<String, client::Client>,
-    pub endpoint_groups: HashMap<String, Vec<endpoint::Endpoint>>,
+    pub endpoint_groups: HashMap<String, endpoint::Endpoint>,
     pub contexts: HashMap<String, Context>,
 }
 
 impl Config {
-    pub fn get_endpoint_group(&self, name: &str) -> Option<&Vec<endpoint::Endpoint>> {
+    pub fn get_endpoint_group(&self, name: &str) -> Option<&endpoint::Endpoint> {
         self.endpoint_groups.get(name)
     }
 
@@ -66,7 +66,7 @@ impl Config {
 impl From<&PathBuf> for Config {
     fn from(dir: &PathBuf) -> Self {
         let clients = Config::load::<client::Client>(dir.join("clients"));
-        let endpoint_groups = Config::load::<Vec<endpoint::Endpoint>>(dir.join("endpoint_groups"));
+        let endpoint_groups = Config::load::<endpoint::Endpoint>(dir.join("endpoint_groups"));
         let contexts = Config::load::<Context>(dir.join("contexts"));
 
         Config {
@@ -85,13 +85,15 @@ mod tests {
     fn test_load_config() {
         let dir = PathBuf::from("example");
         let config: Config = Config::from(&dir);
-        assert!(!config.get_endpoint_group("github").unwrap().is_empty());
+        assert!(config.validate());
+        assert!(config.get_endpoint_group("github").is_some());
         assert!(!config.clients["main"].headers.is_empty());
     }
 
     #[test]
     fn test_empty_config() {
         let config = Config::default();
+        assert!(!config.validate());
         assert!(config.clients.is_empty());
         assert!(config.endpoint_groups.is_empty());
         assert!(config.contexts.is_empty());

@@ -143,18 +143,17 @@ async fn main() {
     for (name, context) in &config.contexts {
         let client = http_clients.get(&context.client).expect("Client not found");
         for group_name in &context.endpoint_groups {
-            let endpoints = config
+            let endpoint = config
                 .get_endpoint_group(group_name)
                 .expect("Endpoint group not found");
-            for endpoint in endpoints {
-                let client_name = name.clone();
-                let endpoint = Arc::new(endpoint.clone());
-                let client = Arc::clone(client);
-                let task = tokio::spawn(async move {
-                    fetch_metrics(client_name, client, endpoint).await;
-                });
-                tasks.push(task);
-            }
+
+            let client_name = name.clone();
+            let endpoint = Arc::new(endpoint.clone());
+            let client = Arc::clone(client);
+            let task = tokio::spawn(async move {
+                fetch_metrics(client_name, client, endpoint).await;
+            });
+            tasks.push(task);
         }
     }
 

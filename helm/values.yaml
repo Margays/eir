@@ -20,7 +20,7 @@ config:
         X-GitHub-Api-Version: 2022-11-28
         User-Agent: Prometheus
       max_connections: 10
-  endpointGroupsPath:
+  endpoint_groups:
     github:
       url: https://api.github.com/rate_limit
       interval: 1m
