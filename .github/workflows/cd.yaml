@@ -127,9 +127,9 @@ jobs:
           TAG_VERSION: ${{ github.ref_name }}
         run: |
           cd ./charts/charts/eir
-          # remove v prefix from version
-          sed -i "s/^version: .*/version: ${TAG_VERSION#v}/" Chart.yaml
-          sed -i "s/^appVersion: .*/appVersion: $TAG_VERSION/" Chart.yaml
+          yq eval -i '.version = env(TAG_VERSION | sub("v"; ""))' Chart.yaml
+          yq eval -i '.appVersion = env(TAG_VERSION)' Chart.yaml
+          yq eval -i 'image.tag = env(TAG_VERSION)' values.yaml
 
       - name: Publish chart
         run: |
