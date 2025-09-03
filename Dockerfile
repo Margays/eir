@@ -6,6 +6,8 @@ ARG REMOTE_UID
 ARG REMOTE_GID
 RUN addgroup --gid ${REMOTE_GID} ${REMOTE_USER}
 RUN adduser --disabled-password --uid ${REMOTE_UID} --gid ${REMOTE_GID} ${REMOTE_USER}
+RUN wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq \
+    && chmod +x /usr/local/bin/yq
 ENV HOME /home/${REMOTE_USER}
 ENV LC_ALL=C.UTF-8
 USER ${REMOTE_USER}

@@ -127,9 +127,9 @@ jobs:
           TAG_VERSION: ${{ github.ref_name }}
         run: |
           cd ./charts/charts/eir
-          yq eval -i '.version = env(TAG_VERSION | sub("v"; ""))' Chart.yaml
-          yq eval -i '.appVersion = env(TAG_VERSION)' Chart.yaml
-          yq eval -i 'image.tag = env(TAG_VERSION)' values.yaml
+          yq eval -i '.version = (strenv(TAG_VERSION) | sub("v"; ""))' Chart.yaml
+          yq eval -i '.appVersion = strenv(TAG_VERSION)' Chart.yaml
+          yq eval -i 'image.tag = strenv(TAG_VERSION)' values.yaml
 
       - name: Publish chart
         run: |
