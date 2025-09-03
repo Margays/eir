@@ -96,3 +96,44 @@ jobs:
           subject-name: index.docker.io/margays/eir
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
+
+  publish_helm_chart:
+    needs: [push_to_registry]
+    name: Publish Helm Chart to chart repository
+    runs-on: ubuntu-latest
+    environment: chart-repository
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+        with:
+          path: source
+
+
+      - name: Clone chart repository
+        uses: actions/checkout@v4
+        with:
+          repository: Margays/charts
+          path: charts
+          token: ${{ secrets.GH_CHART_TOKEN }}
+
+      - name: Copy Helm chart
+        run: |
+          rm -rf ./charts/eir
+          mkdir ./charts/eir
+          cp -R ./helm/* ./charts/eir/
+
+      - name: Update Helm chart version
+        env:
+          TAG_VERSION: ${{ github.ref_name }}
+        run: |
+          cd ./charts/eir
+          # remove v prefix from version
+          sed -i "s/^version: .*/version: ${TAG_VERSION#v}/" Chart.yaml
+          sed -i "s/^appVersion: .*/appVersion: $TAG_VERSION/" Chart.yaml
+
+      - name: Publish chart
+        run: |
+          cd ./charts/eir
+          git add .
+          git commit -m "Update Eir Helm chart for version $TAG_VERSION"
+          git push origin main
