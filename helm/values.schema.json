@@ -1,0 +1,117 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "eir Helm Values Schema",
+  "type": "object",
+  "properties": {
+    "image": {
+      "type": "object",
+      "properties": {
+        "repository": { "type": "string" },
+        "tag": { "type": "string" },
+        "pullPolicy": { "type": "string" }
+      },
+      "required": ["repository", "tag", "pullPolicy"]
+    },
+    "service": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string" },
+        "port": { "type": "integer" }
+      },
+      "required": ["type", "port"]
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "env": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "clients": {
+          "type": "object",
+          "properties": {
+            "main": {
+              "type": "object",
+              "properties": {
+                "headers": {
+                  "type": "object",
+                  "properties": {
+                    "Accept": { "type": "string" },
+                    "Authorization": { "type": "string" },
+                    "X-GitHub-Api-Version": { "type": "string" },
+                    "User-Agent": { "type": "string" }
+                  },
+                  "required": ["Accept", "Authorization", "X-GitHub-Api-Version", "User-Agent"]
+                },
+                "max_connections": { "type": "integer" }
+              },
+              "required": ["headers", "max_connections"]
+            }
+          },
+          "required": ["main"]
+        },
+        "endpoint_groups": {
+          "type": "object",
+          "properties": {
+            "github": {
+              "type": "object",
+              "properties": {
+                "url": { "type": "string" },
+                "interval": { "type": "string" },
+                "metrics": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": { "type": "string" },
+                      "description": { "type": "string" },
+                      "type": { "type": "string" },
+                      "value": { "type": "string" },
+                      "labels": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "name": { "type": "string" },
+                            "value": { "type": "string" }
+                          },
+                          "required": ["name", "value"]
+                        }
+                      }
+                    },
+                    "required": ["name", "description", "type", "value", "labels"]
+                  }
+                }
+              },
+              "required": ["url", "interval", "metrics"]
+            },
+            "contexts": {
+              "type": "object",
+              "properties": {
+                "main": {
+                  "type": "object",
+                  "properties": {
+                    "client": { "type": "string" },
+                    "endpoint_groups": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    }
+                  },
+                  "required": ["client", "endpoint_groups"]
+                }
+              },
+              "required": ["main"]
+            }
+          },
+          "required": ["github", "contexts"]
+        }
+      },
+      "required": ["clients", "endpoint_groups"]
+    }
+  },
+  "required": ["image", "service", "resources", "env", "config"]
+}
