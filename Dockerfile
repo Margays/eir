@@ -1,4 +1,8 @@
-FROM rust:1.88 as builder
+FROM rust:1.88 as base
+
+FROM base AS workspace
+
+FROM base as builder
 RUN mkdir /app && cd /app && USER=root cargo new project
 WORKDIR /app/project
 COPY Cargo.toml /app/project/Cargo.toml

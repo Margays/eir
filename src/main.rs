@@ -3,6 +3,7 @@ use crate::config::endpoint::Endpoint;
 use crate::config::metric::{Label, MetricType};
 use ::metrics::{counter, gauge, histogram};
 use clap::Parser;
+use env_logger::Env;
 use log::{info, warn};
 use metrics::init_metrics;
 use serde_json::{Value, json};
@@ -123,6 +124,7 @@ struct CommandLineArgs {
 
 #[tokio::main]
 async fn main() {
+    env_logger::Builder::from_env(Env::new().filter_or("EXPORTER_LOG_LEVEL", "info")).init();
     let args = CommandLineArgs::parse();
     info!(
         "Using configuration files from configuration dir: {}",
