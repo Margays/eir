@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "eir Helm Values Schema",
+  "title": "eir Helm Chart Values",
   "type": "object",
   "properties": {
     "image": {
@@ -20,11 +20,28 @@
       },
       "required": ["type", "port"]
     },
-    "resources": {
+    "metrics": {
       "type": "object",
-      "additionalProperties": true
+      "properties": {
+        "serviceMonitor": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" }
+          },
+          "required": ["enabled"]
+        }
+      }
     },
+    "affinity": { "type": "object" },
+    "annotations": { "type": "object" },
     "env": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "labels": { "type": "object" },
+    "nodeSelector": { "type": "object" },
+    "resources": { "type": "object" },
+    "tolerations": {
       "type": "array",
       "items": { "type": "object" }
     },
@@ -51,8 +68,7 @@
               },
               "required": ["headers", "max_connections"]
             }
-          },
-          "required": ["main"]
+          }
         },
         "endpoint_groups": {
           "type": "object",
@@ -103,15 +119,24 @@
                   },
                   "required": ["client", "endpoint_groups"]
                 }
-              },
-              "required": ["main"]
+              }
             }
-          },
-          "required": ["github", "contexts"]
+          }
         }
-      },
-      "required": ["clients", "endpoint_groups"]
+      }
     }
   },
-  "required": ["image", "service", "resources", "env", "config"]
+  "required": [
+    "image",
+    "service",
+    "metrics",
+    "affinity",
+    "annotations",
+    "env",
+    "labels",
+    "nodeSelector",
+    "resources",
+    "tolerations",
+    "config"
+  ]
 }

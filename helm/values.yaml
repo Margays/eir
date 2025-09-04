@@ -7,9 +7,17 @@ service:
   type: ClusterIP
   port: 3000
 
-resources: {}
+metrics:
+  serviceMonitor:
+    enabled: false
 
+affinity: {}
+annotations: {}
 env: []
+labels: {}
+nodeSelector: {}
+resources: {}
+tolerations: []
 
 config:
   clients: 
