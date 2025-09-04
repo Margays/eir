@@ -8,6 +8,10 @@ RUN addgroup --gid ${REMOTE_GID} ${REMOTE_USER}
 RUN adduser --disabled-password --uid ${REMOTE_UID} --gid ${REMOTE_GID} ${REMOTE_USER}
 RUN wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq \
     && chmod +x /usr/local/bin/yq
+RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 \
+    && chmod 700 get_helm.sh \
+    && ./get_helm.sh \
+    && rm get_helm.sh
 ENV HOME /home/${REMOTE_USER}
 ENV LC_ALL=C.UTF-8
 USER ${REMOTE_USER}
