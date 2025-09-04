@@ -47,8 +47,8 @@ config:
           labels:
             - name: static
               value: some_static_value
-    contexts:
-      main:
-        client: main
-        endpoint_groups:
-          - github
+  contexts:
+    main:
+      client: main
+      endpoint_groups:
+        - github
