@@ -60,10 +60,10 @@ spec:
       volumes:
         - name: clients-volume
           secret:
-            secretName: {{ include "eir.fullname" . }}-clients-config
+            secretName: {{ include "eir.fullname" . }}-clients
         - name: endpoint-groups-volume
           configMap:
-            name: {{ include "eir.fullname" . }}-endpoint-groups-config
+            name: {{ include "eir.fullname" . }}-endpoint-groups
         - name: contexts-volume
           configMap:
-            name: {{ include "eir.fullname" . }}-contexts-config
+            name: {{ include "eir.fullname" . }}-contexts
