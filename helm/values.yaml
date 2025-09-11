@@ -1,5 +1,5 @@
 image:
-  repository: eir
+  repository: docker.io/margays/eir
   tag: latest
   pullPolicy: IfNotPresent
 
