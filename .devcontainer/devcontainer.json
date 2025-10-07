@@ -20,11 +20,7 @@
         "memory": "8gb",
         "storage": "32gb"
     },
-    "features": {
-        "ghcr.io/devcontainers/features/rust:1": {
-            "version": "latest"
-        }
-    },
+    "features": {},
     "customizations": {
         "codespaces": {
             "openFiles": [
@@ -35,7 +31,8 @@
             "extensions": [
                 "GitHub.copilot",
                 "GitHub.copilot-chat",
-                "rust-lang.rust-analyzer"
+                "rust-lang.rust-analyzer",
+                "fill-labs.dependi"
             ],
             "settings": {
                 "editor.formatOnSave": true,
