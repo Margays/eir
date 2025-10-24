@@ -1,4 +1,4 @@
-FROM rust:1.88 as base
+FROM rust:1.90 as base
 
 FROM base AS workspace
 ARG REMOTE_USER
