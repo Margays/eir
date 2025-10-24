@@ -55,10 +55,10 @@ fn add_env_args(response: &mut Value) {
     let env = std::env::vars_os();
     let mut env_vars = json!({});
     for (key, value) in env {
-        if let Ok(key_str) = key.into_string() {
-            if let Ok(value_str) = value.into_string() {
-                env_vars[key_str] = json!(value_str);
-            }
+        if let Ok(key_str) = key.into_string()
+            && let Ok(value_str) = value.into_string()
+        {
+            env_vars[key_str] = json!(value_str);
         }
     }
     response["env"] = env_vars;
