@@ -5,8 +5,34 @@
 # https://containers.dev/guide/dependabot
 
 version: 2
+
+multi-ecosystem-groups:
+  main:
+    schedule:
+      interval: "daily"
+    target-branch: "main"
+
 updates:
- - package-ecosystem: "devcontainers"
-   directory: "/"
-   schedule:
-     interval: weekly
+  - package-ecosystem: "devcontainers"
+    multi-ecosystem-group: "main"
+    directory: "/"
+    patterns:
+      - "*"
+
+  - package-ecosystem: "github-actions"
+    multi-ecosystem-group: "main"
+    directory: "/"
+    patterns:
+      - "*"
+
+  - package-ecosystem: "docker"
+    multi-ecosystem-group: "main"
+    directory: "/"
+    patterns:
+      - "*"
+
+  - package-ecosystem: "cargo"
+    multi-ecosystem-group: "main"
+    directory: "/"
+    patterns:
+      - "*"
