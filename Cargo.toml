@@ -16,7 +16,7 @@ reqwest = { version = "0.13.1", features = ["json"]}
 tokio = { version = "1.46.1", features = ["full"]}
 chrono = "0.4.41"
 jmespath = "0.4.0"
-clap = { version = "4.5.53", features = ["derive", "env"] }
+clap = { version = "4.5.54", features = ["derive", "env"] }
 log = "0.4.29"
 env_logger = "0.11.8"
 
