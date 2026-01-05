@@ -13,7 +13,7 @@ metrics-util = "0.20.1"
 quanta = "0.12.6"
 rand = "0.9.1"
 reqwest = { version = "0.13.1", features = ["json"]}
-tokio = { version = "1.46.1", features = ["full"]}
+tokio = { version = "1.49.0", features = ["full"]}
 chrono = "0.4.41"
 jmespath = "0.4.0"
 clap = { version = "4.5.54", features = ["derive", "env"] }
