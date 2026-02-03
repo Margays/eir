@@ -14,11 +14,11 @@ quanta = "0.12.6"
 rand = "0.9.1"
 reqwest = { version = "0.13.1", features = ["json"]}
 tokio = { version = "1.49.0", features = ["full"]}
-chrono = "0.4.41"
-jmespath = "0.4.0"
-clap = { version = "4.5.54", features = ["derive", "env"] }
+chrono = "0.4.43"
+jmespath = "0.5.0"
+clap = { version = "4.5.57", features = ["derive", "env"] }
 log = "0.4.29"
 env_logger = "0.11.8"
 
 [dev-dependencies]
-mockito = "1.7.1"
+mockito = "1.7.2"
